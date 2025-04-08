@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+  <a href="{{ url_for('add_expense') }}" class="btn btn-primary mb-3">Add Expense</a>
+  <h4>Total: ${{ total }}</h4>
+  <ul class="list-group mt-3">
+    {% for expense in expenses %}
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+        <div>
+          <strong>${{ expense.amount }}</strong> - {{ expense.description }} ({{ expense.category }})
+        </div>
+        <small class="text-muted">{{ expense.date.strftime('%Y-%m-%d') }}</small>
+      </li>
+    {% endfor %}
+  </ul>
+{% endblock %}

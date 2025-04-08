@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block content %}
+  <form method="POST">
+    <div class="mb-3">
+      <label>Amount</label>
+      <input type="number" name="amount" step="0.01" class="form-control" required>
+    </div>
+    <div class="mb-3">
+      <label>Description</label>
+      <input type="text" name="description" class="form-control" required>
+    </div>
+    <div class="mb-3">
+      <label>Category</label>
+      <select name="category" class="form-control" required>
+        <option>Food</option>
+        <option>Transport</option>
+        <option>Entertainment</option>
+        <option>Bills</option>
+        <option>Other</option>
+      </select>
+    </div>
+    <button type="submit" class="btn btn-success">Add Expense</button>
+    <a href="{{ url_for('index') }}" class="btn btn-secondary">Cancel</a>
+  </form>
+{% endblock %}
