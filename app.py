@@ -20,9 +20,17 @@ class Expense(db.Model):
 
 @app.route('/')
 def index():
-    expenses = Expense.query.order_by(Expense.date.desc()).all()
+    category_filter = request.args.get('category')
+    if category_filter and category_filter != 'All':
+        expenses = Expense.query.filter_by(category=category_filter).order_by(Expense.date.desc()).all()
+    else:
+        expenses = Expense.query.order_by(Expense.date.desc()).all()
+
+    categories = db.session.query(Expense.category).distinct().all()
+    categories = [c[0] for c in categories]  # unpack tuples
     total = sum(e.amount for e in expenses)
-    return render_template('index.html', expenses=expenses, total=total)
+    return render_template('index.html', expenses=expenses, total=total, categories=categories, selected=category_filter)
+
 
 @app.route('/add', methods=['GET', 'POST'])
 def add_expense():
@@ -35,6 +43,13 @@ def add_expense():
         db.session.commit()
         return redirect(url_for('index'))
     return render_template('add_expense.html')
+
+@app.route('/delete/<int:expense_id>')
+def delete_expense(expense_id):
+    expense = Expense.query.get_or_404(expense_id)
+    db.session.delete(expense)
+    db.session.commit()
+    return redirect(url_for('index'))
 
 if __name__ == '__main__':
     with app.app_context():
