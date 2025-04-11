@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
   <a href="{{ url_for('add_expense') }}" class="btn btn-primary mb-3">Add Expense</a>
+  <a href="{{ url_for('monthly_summary') }}" class="btn btn-outline-info">View Monthly Summary</a>
   <h4>Total: ${{ total }}</h4>
   <form method="get" action="{{ url_for('index') }}" class="mb-3">
     <label for="category">Filter by Category:</label>

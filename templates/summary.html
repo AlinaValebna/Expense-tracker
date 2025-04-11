@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block content %}
+<a href="{{ url_for('index') }}" class="btn btn-secondary mb-3">← Back to Expenses</a>
+<h3>Summary for {{ month }} {{ year }}</h3>
+<h4>Total Spent: ${{ total }}</h4>
+
+<ul class="list-group mt-4">
+    {% for category, amount in summary %}
+    <li class="list-group-item d-flex justify-content-between">
+        <span>{{ category }}</span>
+        <strong>${{ '%.2f' | format(amount) }}</strong>
+    </li>
+    {% else %}
+    <li class="list-group-item text-muted">No expenses recorded this month.</li>
+    {% endfor %}
+</ul>
+{% endblock %}
