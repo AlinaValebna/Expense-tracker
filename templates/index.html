@@ -26,6 +26,43 @@
   </div>
 </div>
 
+<!-- EXPENSES BY CATEGORY CHART -->
+<div class="mt-4 mb-5">
+  <h5>🧁 Expenses Breakdown by Category</h5>
+  <canvas id="expensesChart" width="400" height="400"></canvas>
+</div>
+
+<script>
+  const ctx = document.getElementById('expensesChart').getContext('2d');
+  const expensesChart = new Chart(ctx, {
+    type: 'pie',
+    data: {
+      labels: {{ chart_labels | tojson }},
+  datasets: [{
+    data: {{ chart_data | tojson }},
+    backgroundColor: [
+    '#4A90E2', '#50E3C2', '#F5A623', '#F8E71C',
+    '#B8E986', '#BD10E0', '#FF6F61', '#7ED6DF'
+  ],
+    borderWidth: 1
+      }]
+    },
+  options: {
+    responsive: true,
+      plugins: {
+      legend: { position: 'bottom' },
+      tooltip: {
+        callbacks: {
+          label: function(context) {
+            return `${context.label}: $${context.parsed}`;
+          }
+        }
+      }
+    }
+  }
+  });
+</script>
+
 
 <!-- NAV TO SAVINGS GOALS -->
 <div class="mb-4">
