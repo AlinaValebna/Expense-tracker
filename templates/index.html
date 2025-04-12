@@ -1,37 +1,93 @@
 {% extends "base.html" %}
 {% block content %}
 
-<!-- FILTER -->
-<form method="get" class="mb-3 d-flex gap-2 align-items-center">
-  <label for="filter">View:</label>
-  <select name="filter" id="filter" class="form-select w-auto" onchange="this.form.submit()">
-    <option value="all" {% if filter=='all' %}selected{% endif %}>All</option>
-    <option value="month" {% if filter=='month' %}selected{% endif %}>This Month</option>
-    <option value="week" {% if filter=='week' %}selected{% endif %}>This Week</option>
-  </select>
-</form>
+<div class="row g-4">
 
-<!-- FINANCIAL SUMMARY -->
-<div class="mb-4">
-  <div class="card p-3">
-    <h5 class="mb-2">📊 This Month</h5>
-    <p><strong>Income:</strong> ${{ '%.2f' | format(income) }}</p>
-    <p><strong>Expenses:</strong> ${{ '%.2f' | format(total_expenses) }}</p>
-    <p>
-      <strong>Net Balance:</strong>
-      <span class="{% if net < 0 %}text-danger{% else %}text-success{% endif %}">
-        ${{ '%.2f' | format(net) }}
-      </span>
-    </p>
+  <!-- FINANCIAL SUMMARY -->
+  <div class="col-md-6">
+    <div class="card p-3 h-100">
+      <h5>📊 This Month</h5>
+      <p><strong>Income:</strong> ${{ '%.2f' | format(income) }}</p>
+      <p><strong>Expenses:</strong> ${{ '%.2f' | format(total_expenses) }}</p>
+      <p>
+        <strong>Net:</strong>
+        <span class="{% if net < 0 %}text-danger{% else %}text-success{% endif %}">
+          ${{ '%.2f' | format(net) }}
+        </span>
+      </p>
+    </div>
+  </div>
+
+  <!-- PIE CHART -->
+  <div class="col-md-6">
+    <div class="card p-3 h-100">
+      <h5>🧁 By Category</h5>
+      <canvas id="expensesChart" height="180"></canvas>
+    </div>
+  </div>
+
+</div>
+
+<!-- SAVINGS GOALS -->
+<div class="card p-3 mt-4">
+  <h5 class="mb-3">💰 Top Savings Goals</h5>
+  <div class="row g-3">
+    {% for goal in goals %}
+    <div class="col-md-4">
+      <div class="p-3 border h-100">
+        <strong>{{ goal.name }}</strong>
+        <p>${{ '%.2f' | format(goal.saved_amount) }} / ${{ '%.2f' | format(goal.target_amount) }}</p>
+        <div class="progress" style="height: 16px;">
+          <div class="progress-bar bg-info"
+            style="width: {{ (goal.saved_amount / goal.target_amount * 100) | round(1) }}%;">
+            {{ (goal.saved_amount / goal.target_amount * 100) | round(1) }}%
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  <div class="mt-3">
+    <a href="{{ url_for('goals') }}" class="btn btn-outline-secondary btn-sm">View All Goals →</a>
   </div>
 </div>
 
-<!-- EXPENSES BY CATEGORY CHART -->
-<div class="mt-4 mb-5">
-  <h5>🧁 Expenses Breakdown by Category</h5>
-  <canvas id="expensesChart" width="400" height="400"></canvas>
+<!-- FILTER + EXPENSE LIST -->
+<div class="mt-4 card p-3">
+  <form method="get" class="mb-3 d-flex align-items-center gap-2">
+    <label for="filter">Filter:</label>
+    <select name="filter" id="filter" class="form-select w-auto" onchange="this.form.submit()">
+      <option value="all" {% if filter=='all' %}selected{% endif %}>All</option>
+      <option value="month" {% if filter=='month' %}selected{% endif %}>This Month</option>
+      <option value="week" {% if filter=='week' %}selected{% endif %}>This Week</option>
+    </select>
+  </form>
+
+  <ul class="list-group">
+    {% for expense in expenses %}
+    <li class="list-group-item d-flex justify-content-between align-items-center">
+      <div>
+        <strong>${{ '%.2f' | format(expense.amount) }}</strong> –
+        {{ expense.description }} <span class="text-muted">({{ expense.category }})</span>
+      </div>
+      <div class="d-flex gap-2 align-items-center">
+        <small class="text-muted">{{ expense.date.strftime('%Y-%m-%d') }}</small>
+        <a href="{{ url_for('delete_expense', expense_id=expense.id) }}" class="btn btn-sm btn-danger">Delete</a>
+      </div>
+    </li>
+    {% else %}
+    <li class="list-group-item text-muted">No expenses found.</li>
+    {% endfor %}
+  </ul>
 </div>
 
+<!-- ADD EXPENSE -->
+<div class="mt-4 text-end">
+  <a href="{{ url_for('add_expense') }}" class="btn btn-success">➕ Add Expense</a>
+</div>
+
+<!-- CHART SCRIPT -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
   const ctx = document.getElementById('expensesChart').getContext('2d');
   const expensesChart = new Chart(ctx, {
@@ -62,55 +118,5 @@
   }
   });
 </script>
-
-
-<!-- NAV TO SAVINGS GOALS -->
-<div class="mb-4">
-  <a href="{{ url_for('goals') }}" class="btn btn-outline-primary">💰 View Savings Goals</a>
-</div>
-<!-- EMBEDDED GOALS PREVIEW -->
-<h5 class="mt-4">Top Savings Goals</h5>
-{% if goals %}
-{% for goal in goals %}
-<div class="mb-3 p-3 border rounded">
-  <div class="d-flex justify-content-between">
-    <strong>{{ goal.name }}</strong>
-    <span>${{ '%.2f' | format(goal.saved_amount) }} / ${{ '%.2f' | format(goal.target_amount) }}</span>
-  </div>
-  <div class="progress mt-2" style="height: 18px;">
-    <div class="progress-bar bg-info" style="width: {{ (goal.saved_amount / goal.target_amount * 100) | round(1) }}%;">
-      {{ (goal.saved_amount / goal.target_amount * 100) | round(1) }}%
-    </div>
-  </div>
-</div>
-{% endfor %}
-<a href="{{ url_for('goals') }}" class="btn btn-outline-secondary btn-sm">View All Goals →</a>
-{% else %}
-<p class="text-muted">No savings goals yet. <a href="{{ url_for('goals') }}">Create one →</a></p>
-{% endif %}
-
-<!-- EXPENSE LIST -->
-<ul class="list-group">
-  {% for expense in expenses %}
-  <li class="list-group-item d-flex justify-content-between align-items-center">
-    <div>
-      <strong>${{ '%.2f' | format(expense.amount) }}</strong> –
-      {{ expense.description }}
-      <span class="text-muted">({{ expense.category }})</span>
-    </div>
-    <div class="d-flex gap-2 align-items-center">
-      <small class="text-muted">{{ expense.date.strftime('%Y-%m-%d') }}</small>
-      <a href="{{ url_for('delete_expense', expense_id=expense.id) }}" class="btn btn-sm btn-danger">Delete</a>
-    </div>
-  </li>
-  {% else %}
-  <li class="list-group-item text-muted">No expenses found.</li>
-  {% endfor %}
-</ul>
-
-<!-- ADD EXPENSE BUTTON -->
-<div class="mt-4">
-  <a href="{{ url_for('add_expense') }}" class="btn btn-success">➕ Add Expense</a>
-</div>
 
 {% endblock %}
