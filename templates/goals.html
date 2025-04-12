@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block content %}
+<h3>Savings Goals</h3>
+
+<form method="POST" class="mb-4">
+    <input type="text" name="name" placeholder="Goal Name" class="form-control mb-2" required>
+    <input type="number" name="target" step="0.01" placeholder="Target Amount" class="form-control mb-2" required>
+    <button type="submit" class="btn btn-primary">Create Goal</button>
+</form>
+
+{% for goal in goals %}
+<div class="card mb-3 p-3">
+    <h5>{{ goal.name }}</h5>
+    <p>${{ goal.saved_amount }} / ${{ goal.target_amount }}</p>
+    <div class="progress mb-2" style="height: 20px;">
+        <div class="progress-bar" style="width: {{ (goal.saved_amount / goal.target_amount * 100) | round(2) }}%;">
+            {{ (goal.saved_amount / goal.target_amount * 100) | round(1) }}%
+        </div>
+    </div>
+    <form method="POST" action="{{ url_for('add_saving', goal_id=goal.id) }}" class="d-flex gap-2">
+        <input type="number" name="amount" step="0.01" placeholder="Add to savings" class="form-control" required>
+        <button type="submit" class="btn btn-success">Add</button>
+    </form>
+</div>
+{% else %}
+<p>No goals yet.</p>
+{% endfor %}
+{% endblock %}

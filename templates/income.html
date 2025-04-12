@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block content %}
+<h3>Income</h3>
+
+<form method="POST" class="mb-4">
+    <input type="text" name="source" placeholder="Source (e.g. Salary)" class="form-control mb-2" required>
+    <input type="number" name="amount" step="0.01" placeholder="Amount" class="form-control mb-2" required>
+    <button type="submit" class="btn btn-success">Add Income</button>
+</form>
+
+<h5>Total Income: ${{ total_income }}</h5>
+
+<ul class="list-group mt-3">
+    {% for income in incomes %}
+    <li class="list-group-item d-flex justify-content-between">
+        <span>{{ income.source }} – ${{ '%.2f' | format(income.amount) }}</span>
+        <small class="text-muted">{{ income.date.strftime('%Y-%m-%d') }}</small>
+    </li>
+    {% endfor %}
+</ul>
+
+{% endblock %}

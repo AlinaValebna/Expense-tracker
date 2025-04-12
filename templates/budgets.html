@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block content %}
+<h3>Category Budgets</h3>
+
+<form method="POST" class="mb-4">
+    <input type="text" name="category" placeholder="Category" class="form-control mb-2" required>
+    <input type="number" name="limit" step="0.01" placeholder="Monthly Limit" class="form-control mb-2" required>
+    <button type="submit" class="btn btn-primary">Set / Update Budget</button>
+</form>
+
+{% for budget in budgets %}
+{% set spent = expenses.get(budget.category, 0) %}
+<div class="mb-3 p-3 border rounded">
+    <strong>{{ budget.category }}</strong>
+    <p>${{ '%.2f' | format(spent) }} spent / ${{ '%.2f' | format(budget.limit) }} limit</p>
+    <div class="progress" style="height: 18px;">
+        {% set percent = (spent / budget.limit * 100) if budget.limit > 0 else 0 %}
+        <div class="progress-bar {% if percent > 100 %}bg-danger{% else %}bg-success{% endif %}"
+            style="width: {{ percent if percent < 100 else 100 }}%;">
+            {{ percent | round(1) }}%
+        </div>
+    </div>
+</div>
+{% else %}
+<p>No budgets set.</p>
+{% endfor %}
+{% endblock %}
