@@ -61,6 +61,15 @@ class CategoryBudget(db.Model):
 def load_user(user_id):
     return User.query.get(int(user_id))
 
+category_icons = {
+    "Food": "🍔",
+    "Transport": "🚗",
+    "Entertainment": "🎮",
+    "Bills": "💡",
+    "Health": "💊",
+    "Shopping": "🛍️",
+    "Other": "💸"
+}
 # Routes
 @app.route('/')
 @login_required
@@ -68,6 +77,15 @@ def index():
     filter_option = request.args.get('filter', 'all')
     expenses_query = Expense.query.filter_by(user_id=current_user.id)
     now = datetime.utcnow()
+    category_icons = {
+        "Food": "🍔",
+        "Transport": "🚗",
+        "Entertainment": "🎮",
+        "Bills": "💡",
+        "Health": "💊",
+        "Shopping": "🛍️",
+        "Other": "💸"
+    }
 
     if filter_option == 'month':
         expenses_query = expenses_query.filter(
@@ -108,7 +126,8 @@ def index():
         filter=filter_option,
         goals=goals,
         chart_labels=chart_labels,
-        chart_data=chart_data
+        chart_data=chart_data,
+        category_icons=category_icons
     )
 
 @app.route('/add', methods=['GET', 'POST'])
