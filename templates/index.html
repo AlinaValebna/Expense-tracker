@@ -5,7 +5,7 @@
 
   <!-- FINANCIAL SUMMARY -->
   <div class="col-md-6">
-    <div class="card p-3 h-100">
+    <div class="card p-3 h-100" style="width: 320px; height: 320px;">
       <h5>📊 This Month</h5>
       <p><strong>Income:</strong> ${{ '%.2f' | format(income) }}</p>
       <p><strong>Expenses:</strong> ${{ '%.2f' | format(total_expenses) }}</p>
@@ -19,10 +19,11 @@
   </div>
 
   <!-- PIE CHART -->
-  <div class="col-md-6">
+  <div class="col-md-6" style="width: 420px; height: 420px; margin-left: 20px;">
     <div class="card p-3 h-100">
       <h5>🧁 By Category</h5>
-      <canvas id="expensesChart" height="150"></canvas>
+      <canvas id="expensesChart" width="420" height="420" style="max-width: 100%;"></canvas>
+
     </div>
   </div>
 
@@ -104,12 +105,19 @@
     '#B8E986', '#BD10E0', '#FF6F61', '#7ED6DF'
   ],
     borderWidth: 1
-      }]
-    },
+    }]
+  },
   options: {
     responsive: true,
-      plugins: {
-      legend: { position: 'bottom' },
+      maintainAspectRatio: false,
+        plugins: {
+      legend: {
+        position: 'right',  // 👈 change this line
+          labels: {
+          boxWidth: 12,
+            font: { size: 12 }
+        }
+      },
       tooltip: {
         callbacks: {
           label: function(context) {
@@ -119,7 +127,7 @@
       }
     }
   }
-  });
+});
 </script>
 
 {% endblock %}
