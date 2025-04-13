@@ -9,18 +9,33 @@
 </form>
 
 {% for goal in goals %}
-<div class="card mb-3 p-3">
-    <h5>{{ goal.name }}</h5>
-    <p>${{ goal.saved_amount }} / ${{ goal.target_amount }}</p>
-    <div class="progress mb-2" style="height: 20px;">
-        <div class="progress-bar" style="width: {{ (goal.saved_amount / goal.target_amount * 100) | round(2) }}%;">
-            {{ (goal.saved_amount / goal.target_amount * 100) | round(1) }}%
+<div class="row align-items-center mb-3 p-3 border rounded">
+    <div class="col">
+        <h6 class="mb-1">{{ goal.name }}</h6>
+        <p class="mb-1 text-muted">${{ '%.2f' | format(goal.saved_amount) }} / ${{ '%.2f' | format(goal.target_amount)
+            }}</p>
+        <div class="progress mb-3" style="height: 16px;">
+            <div class="progress-bar bg-info"
+                style="width: {{ (goal.saved_amount / goal.target_amount * 100) | round(1) }}%;">
+                {{ (goal.saved_amount / goal.target_amount * 100) | round(1) }}%
+            </div>
+        </div>
+
+        <div class="row g-2 align-items-center">
+            <div class="col-md-8">
+                <form method="POST" action="{{ url_for('add_saving', goal_id=goal.id) }}" class="d-flex">
+                    <input type="number" name="amount" step="0.01" class="form-control me-2" placeholder="Add amount"
+                        required>
+                    <button type="submit" class="btn btn-sm btn-success">➕ Add</button>
+                </form>
+            </div>
+            <div class="col-md-4 text-end">
+                <form method="POST" action="{{ url_for('delete_goal', goal_id=goal.id) }}">
+                    <button type="submit" class="btn btn-sm btn-outline-danger">🗑 Remove</button>
+                </form>
+            </div>
         </div>
     </div>
-    <form method="POST" action="{{ url_for('add_saving', goal_id=goal.id) }}" class="d-flex gap-2">
-        <input type="number" name="amount" step="0.01" placeholder="Add to savings" class="form-control" required>
-        <button type="submit" class="btn btn-success">Add</button>
-    </form>
 </div>
 {% else %}
 <p>No goals yet.</p>

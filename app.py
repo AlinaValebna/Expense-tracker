@@ -218,6 +218,17 @@ def add_saving(goal_id):
     db.session.commit()
     return redirect(url_for('goals'))
 
+@app.route('/delete_goal/<int:goal_id>', methods=['POST'])
+@login_required
+def delete_goal(goal_id):
+    goal = SavingGoal.query.get_or_404(goal_id)
+    if goal.owner != current_user:
+        return "Unauthorized"
+    db.session.delete(goal)
+    db.session.commit()
+    return redirect(url_for('goals'))
+
+
 @app.route('/income', methods=['GET', 'POST'])
 @login_required
 def income():
