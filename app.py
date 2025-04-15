@@ -28,6 +28,7 @@ class User(UserMixin, db.Model):
     saving_goals = db.relationship('SavingGoal', backref='owner', lazy=True)
     incomes = db.relationship('Income', backref='owner', lazy=True)
     category_budgets = db.relationship('CategoryBudget', backref='owner', lazy=True)
+    wealth_note = db.relationship('WealthNote', backref='owner', uselist=False)
 
 class Expense(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -56,6 +57,13 @@ class CategoryBudget(db.Model):
     category = db.Column(db.String(50), nullable=False)
     limit = db.Column(db.Float, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+
+class WealthNote(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    text = db.Column(db.Text, nullable=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -116,6 +124,8 @@ def index():
         category_totals[expense.category] += expense.amount
     chart_labels = list(category_totals.keys())
     chart_data = [round(amount, 2) for amount in category_totals.values()]
+    note = WealthNote.query.filter_by(user_id=current_user.id).first()
+    note_text = note.text if note else ''
 
     return render_template(
         'index.html',
@@ -127,8 +137,11 @@ def index():
         goals=goals,
         chart_labels=chart_labels,
         chart_data=chart_data,
-        category_icons=category_icons
+        category_icons=category_icons,
+        note_text=note_text
     )
+
+
 
 @app.route('/add', methods=['GET', 'POST'])
 @login_required
@@ -268,6 +281,18 @@ def budgets():
     ).group_by(Expense.category).all()
     expense_dict = dict(expenses_by_category)
     return render_template('budgets.html', budgets=budgets, expenses=expense_dict)
+
+@app.route('/add_wealth_note', methods=['POST'])
+@login_required
+def add_wealth_note():
+    note = WealthNote.query.filter_by(user_id=current_user.id).first()
+    if not note:
+        note = WealthNote(user_id=current_user.id)
+        db.session.add(note)
+    note.text = request.form['text']
+    db.session.commit()
+    return redirect(url_for('index'))
+
 
 if __name__ == '__main__':
     with app.app_context():

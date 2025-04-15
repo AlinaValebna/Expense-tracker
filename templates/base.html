@@ -85,6 +85,7 @@
       <div class="ms-auto">
         {% if current_user.is_authenticated %}
         <span class="me-2 text-muted">Hi, {{ current_user.username }}!</span>
+        <a href="{{ url_for('income') }}" class="btn btn-outline-primary btn-sm">Add Income</a>
         <a href="{{ url_for('logout') }}" class="btn btn-outline-danger btn-sm">Logout</a>
         {% else %}
         <a href="{{ url_for('login') }}" class="btn btn-outline-primary btn-sm me-2">Login</a>

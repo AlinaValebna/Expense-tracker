@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
-<!-- SAVINGS GOALS PANEL FIRST -->
+
+<!-- TOP SAVINGS GOALS PANEL -->
 <div class="card p-3 mb-4">
   <h6 class="mb-3 text-muted">💰 Top Savings Goals</h6>
   <div class="row g-2">
@@ -27,70 +28,76 @@
   </div>
 </div>
 
-<div class="row g-4">
-
-<div class="row g-3 align-items-stretch">
-
-<!-- FINANCIAL SUMMARY (compact) -->
-<div class="col-md-6 col-lg-6">
-  <div class="card p-3 h-100" style="width: 420px; height: 420px;">
-    <h6 class="text-muted mb-3">📊 This Month</h6>
-    <div class="small">
-      <div><strong>Income:</strong> ${{ '%.2f' | format(income) }}</div>
-      <div><strong>Expenses:</strong> ${{ '%.2f' | format(total_expenses) }}</div>
-      <div>
-        <strong>Net:</strong>
-        <span class="{% if net < 0 %}text-danger{% else %}text-success{% endif %}">
-          ${{ '%.2f' | format(net) }}
-        </span>
+<div class="row g-3">
+  <!-- Left Column -->
+  <div class="col-md-4">
+    <!-- COMPACT THIS MONTH -->
+    <div class="card p-3 mb-3">
+      <h6 class="text-muted mb-2">📊 This Month</h6>
+      <div class="small">
+        <div><strong>Income:</strong> ${{ '%.2f' | format(income) }}</div>
+        <div><strong>Expenses:</strong> ${{ '%.2f' | format(total_expenses) }}</div>
+        <div>
+          <strong>Net:</strong>
+          <span class="{% if net < 0 %}text-danger{% else %}text-success{% endif %}">
+            ${{ '%.2f' | format(net) }}
+          </span>
+        </div>
       </div>
     </div>
-  </div>
-</div>
 
-<!-- PIE CHART -->
-<div class="col-md-6" style="width: 420px; height: 420px;">
-  <div class="card p-3 h-100">
-    <h5>🧁 By Category</h5>
-    <canvas id="expensesChart" width="420" height="420" style="max-width: 100%;"></canvas>
-      </div>
+    <!-- WEALTH NOTE -->
+    <div class="card p-3 small">
+      <h6 class="text-muted mb-2">📝 Wealth Note</h6>
+      <form method="POST" action="{{ url_for('add_wealth_note') }}">
+        <textarea name="text" class="form-control mb-2" rows="3"
+          placeholder="Reflect on your finances this week...">{{ note_text or '' }}</textarea>
+        <button type="submit" class="btn btn-sm btn-outline-primary">Save Note</button>
+      </form>
     </div>
   </div>
 
-</div>
-
-
-
-<!-- FILTER + EXPENSE LIST -->
-<div class="mt-4 card p-3">
-  <form method="get" class="mb-3 d-flex align-items-center gap-2">
-    <label for="filter">Filter:</label>
-    <select name="filter" id="filter" class="form-select w-auto" onchange="this.form.submit()">
-      <option value="all" {% if filter=='all' %}selected{% endif %}>All</option>
-      <option value="month" {% if filter=='month' %}selected{% endif %}>This Month</option>
-      <option value="week" {% if filter=='week' %}selected{% endif %}>This Week</option>
-    </select>
-  </form>
-
-  <ul class="list-group">
-    {% for expense in expenses %}
-    <li class="list-group-item d-flex justify-content-between align-items-center">
-      <div>
-        <strong>${{ '%.2f' | format(expense.amount) }}</strong> –
-        {{ expense.description }}
-        <span class="text-muted">
-          ({{ category_icons.get(expense.category, '💸') }} {{ expense.category }})
-        </span>
+  <!-- Right Column -->
+  <div class="col-md-8">
+    <!-- PIE CHART -->
+    <div class="card p-3 mb-3">
+      <h6 class="text-muted mb-2">🧁 Category Breakdown</h6>
+      <div class="d-flex align-items-center justify-content-center" style="min-height: 280px;">
+        <canvas id="expensesChart" width="280" height="280" style="max-width: 100%; height: auto;"></canvas>
       </div>
-      <div class="d-flex gap-2 align-items-center">
-        <small class="text-muted">{{ expense.date.strftime('%Y-%m-%d') }}</small>
-        <a href="{{ url_for('delete_expense', expense_id=expense.id) }}" class="btn btn-sm btn-danger">Delete</a>
-      </div>
-    </li>
-    {% else %}
-    <li class="list-group-item text-muted">No expenses found.</li>
-    {% endfor %}
-  </ul>
+    </div>
+
+    <!-- EXPENSE LIST -->
+    <div class="card p-3">
+      <form method="get" class="mb-2 d-flex align-items-center gap-2">
+        <label for="filter" class="form-label m-0">Filter:</label>
+        <select name="filter" id="filter" class="form-select form-select-sm w-auto" onchange="this.form.submit()">
+          <option value="all" {% if filter=='all' %}selected{% endif %}>All</option>
+          <option value="month" {% if filter=='month' %}selected{% endif %}>This Month</option>
+          <option value="week" {% if filter=='week' %}selected{% endif %}>This Week</option>
+        </select>
+      </form>
+
+      <ul class="list-group small">
+        {% for expense in expenses %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+          <div>
+            <strong>${{ '%.2f' | format(expense.amount) }}</strong> – {{ expense.description }}<br>
+            <span class="badge bg-light border text-muted mt-1">
+              {{ category_icons.get(expense.category, '💸') }} {{ expense.category }}
+            </span>
+          </div>
+          <div class="d-flex gap-2 align-items-center">
+            <small class="text-muted">{{ expense.date.strftime('%b %d') }}</small>
+            <a href="{{ url_for('delete_expense', expense_id=expense.id) }}" class="btn btn-sm btn-outline-danger">✖</a>
+          </div>
+        </li>
+        {% else %}
+        <li class="list-group-item text-muted">No expenses found.</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
 </div>
 
 <!-- ADD EXPENSE -->
@@ -98,7 +105,7 @@
   <a href="{{ url_for('add_expense') }}" class="btn btn-success">➕ Add Expense</a>
 </div>
 
-<!-- CHART SCRIPT -->
+<!-- CHART.JS -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
   const ctx = document.getElementById('expensesChart').getContext('2d');
@@ -113,14 +120,14 @@
     '#B8E986', '#BD10E0', '#FF6F61', '#7ED6DF'
   ],
     borderWidth: 1
-    }]
-  },
+      }]
+    },
   options: {
     responsive: true,
       maintainAspectRatio: false,
         plugins: {
       legend: {
-        position: 'right',  // 👈 change this line
+        position: 'right',
           labels: {
           boxWidth: 12,
             font: { size: 12 }
@@ -135,7 +142,7 @@
       }
     }
   }
-});
+  });
 </script>
 
 {% endblock %}
