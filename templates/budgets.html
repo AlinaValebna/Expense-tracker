@@ -1,27 +1,42 @@
 {% extends "base.html" %}
 {% block content %}
-<h3>Category Budgets</h3>
 
-<form method="POST" class="mb-4">
-    <input type="text" name="category" placeholder="Category" class="form-control mb-2" required>
-    <input type="number" name="limit" step="0.01" placeholder="Monthly Limit" class="form-control mb-2" required>
-    <button type="submit" class="btn btn-primary">Set / Update Budget</button>
-</form>
-
-{% for budget in budgets %}
-{% set spent = expenses.get(budget.category, 0) %}
-<div class="mb-3 p-3 border rounded">
-    <strong>{{ budget.category }}</strong>
-    <p>${{ '%.2f' | format(spent) }} spent / ${{ '%.2f' | format(budget.limit) }} limit</p>
-    <div class="progress" style="height: 18px;">
-        {% set percent = (spent / budget.limit * 100) if budget.limit > 0 else 0 %}
-        <div class="progress-bar {% if percent > 100 %}bg-danger{% else %}bg-success{% endif %}"
-            style="width: {{ percent if percent < 100 else 100 }}%;">
-            {{ percent | round(1) }}%
+<div class="card p-4 mb-4">
+    <h5 class="text-muted mb-3">📊 Set Monthly Budget Per Category</h5>
+    <form method="POST" class="row g-2">
+        <div class="col-md-6">
+            <input type="text" name="category" class="form-control" placeholder="Category (e.g. Food, Transport)"
+                required>
         </div>
-    </div>
+        <div class="col-md-4">
+            <input type="number" step="0.01" name="limit" class="form-control" placeholder="Monthly limit" required>
+        </div>
+        <div class="col-md-2 d-grid">
+            <button type="submit" class="btn btn-primary">Set</button>
+        </div>
+    </form>
 </div>
-{% else %}
-<p>No budgets set.</p>
-{% endfor %}
+
+<div class="card p-4">
+    <h5 class="text-muted mb-3">🧾 Your Category Budgets</h5>
+    <ul class="list-group">
+        {% for budget in budgets %}
+        <li class="list-group-item d-flex flex-column">
+            <div class="d-flex justify-content-between">
+                <strong>{{ budget.category }}</strong>
+                <span class="text-muted">${{ '%.2f' | format(expenses.get(budget.category, 0)) }} / ${{ '%.2f' |
+                    format(budget.limit) }}</span>
+            </div>
+            <div class="progress mt-2">
+                {% set used = expenses.get(budget.category, 0) %}
+                <div class="progress-bar {% if used > budget.limit %}bg-danger{% else %}bg-success{% endif %}"
+                    style="width: {{ (used / budget.limit * 100) if budget.limit else 0 | round(1) }}%;">
+                    {{ (used / budget.limit * 100) if budget.limit else 0 | round(1) }}%
+                </div>
+            </div>
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+
 {% endblock %}
