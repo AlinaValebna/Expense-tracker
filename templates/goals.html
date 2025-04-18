@@ -1,27 +1,26 @@
 {% extends "base.html" %}
 {% block content %}
 
-<div class="card p-4 mb-4">
+<div class="card p-4 mb-4 fade-in">
     <h5 class="text-muted mb-3">🎯 Set a New Saving Goal</h5>
     <form method="POST" class="row g-2">
-        <div class="col-md-6">
-            <input type="text" name="name" class="form-control" placeholder="Goal name (e.g. Vacation, New Laptop)"
-                required>
+        <div class="col-12 col-md-6">
+            <input type="text" name="name" class="form-control" placeholder="Goal name" required>
         </div>
-        <div class="col-md-4">
+        <div class="col-8 col-md-4">
             <input type="number" step="0.01" name="target" class="form-control" placeholder="Target amount" required>
         </div>
-        <div class="col-md-2 d-grid">
-            <button type="submit" class="btn btn-primary">Add Goal</button>
+        <div class="col-4 col-md-2 d-grid">
+            <button type="submit" class="btn btn-primary">Add</button>
         </div>
     </form>
 </div>
 
-<div class="card p-4">
+<div class="card p-4 fade-in">
     <h5 class="text-muted mb-3">📌 Active Savings Goals</h5>
     <div class="row g-3">
         {% for goal in goals %}
-        <div class="col-md-6">
+        <div class="col-12 col-md-6">
             <div class="border rounded p-3 h-100">
                 <h6 class="mb-1">{{ goal.name }}</h6>
                 <div class="small text-muted mb-1">${{ '%.2f' | format(goal.saved_amount) }} / ${{ '%.2f' |
@@ -33,13 +32,13 @@
                     </div>
                 </div>
                 <form method="POST" action="{{ url_for('add_saving', goal_id=goal.id) }}"
-                    class="d-flex align-items-center gap-2 mb-2">
-                    <input type="number" name="amount" step="0.01" class="form-control form-control-sm"
-                        placeholder="Add amount" required>
-                    <button type="submit" class="btn btn-sm btn-success">ADD</button>
+                    class="d-flex flex-column flex-sm-row align-items-stretch gap-2 mb-2">
+                    <input type="number" name="amount" step="0.01" class="form-control" placeholder="Add amount"
+                        required>
+                    <button type="submit" class="btn btn-success w-100 w-sm-auto">➕</button>
                 </form>
                 <form method="POST" action="{{ url_for('delete_goal', goal_id=goal.id) }}">
-                    <button type="submit" class="btn btn-sm btn-outline-danger w-100">🗑 Remove</button>
+                    <button type="submit" class="btn btn-outline-danger w-100">🗑 Remove</button>
                 </form>
             </div>
         </div>

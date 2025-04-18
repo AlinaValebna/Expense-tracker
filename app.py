@@ -7,7 +7,8 @@ from datetime import datetime, timedelta
 from collections import defaultdict
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///expenses.db'
+import os
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///{}'.format(os.path.join(os.getcwd(), 'expenses.db'))
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.secret_key = 'your_secret_key_here'
 
@@ -175,19 +176,23 @@ def delete_expense(expense_id):
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
-        username = request.form['username']
-        email = request.form['email']
-        password = request.form['password']
-        hashed_password = generate_password_hash(password)
+        try:
+            username = request.form['username']
+            email = request.form['email']
+            password = request.form['password']
+            hashed_password = generate_password_hash(password)
 
-        if User.query.filter_by(email=email).first():
-            return "Email already registered."
+            if User.query.filter_by(email=email).first():
+                return "Email already registered."
 
-        new_user = User(username=username, email=email, password=hashed_password)
-        db.session.add(new_user)
-        db.session.commit()
-        return redirect(url_for('login'))
+            new_user = User(username=username, email=email, password=hashed_password)
+            db.session.add(new_user)
+            db.session.commit()
+            return redirect(url_for('login'))
+        except Exception as e:
+            return f"Registration error: {e}"  # ⛑️ Show error in browser
     return render_template('register.html')
+
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():

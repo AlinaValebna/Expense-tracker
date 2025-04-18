@@ -2,11 +2,11 @@
 {% block content %}
 
 <!-- TOP SAVINGS GOALS PANEL -->
-<div class="card p-3 mb-4">
+<div class="card p-3 mb-4 fade-in">
   <h6 class="mb-3 text-muted">💰 Top Savings Goals</h6>
-  <div class="row g-2">
+  <div class="row g-3">
     {% for goal in goals %}
-    <div class="col-md-4 col-sm-6">
+    <div class="col-12 col-md-4">
       <div class="p-3 border rounded small h-100">
         <strong>{{ goal.name }}</strong>
         <div class="d-flex justify-content-between text-muted small">
@@ -30,9 +30,9 @@
 
 <div class="row g-3">
   <!-- Left Column -->
-  <div class="col-md-4">
-    <!-- COMPACT THIS MONTH -->
-    <div class="card p-3 mb-3">
+  <div class="col-12 col-md-4">
+    <!-- THIS MONTH -->
+    <div class="card p-3 mb-3 fade-in">
       <h6 class="text-muted mb-2">📊 This Month</h6>
       <div class="small">
         <div><strong>Income:</strong> ${{ '%.2f' | format(income) }}</div>
@@ -47,20 +47,20 @@
     </div>
 
     <!-- WEALTH NOTE -->
-    <div class="card p-3 small">
+    <div class="card p-3 small fade-in">
       <h6 class="text-muted mb-2">📝 Wealth Note</h6>
       <form method="POST" action="{{ url_for('add_wealth_note') }}">
         <textarea name="text" class="form-control mb-2" rows="3"
           placeholder="Reflect on your finances this week...">{{ note_text or '' }}</textarea>
-        <button type="submit" class="btn btn-sm btn-outline-primary">Save Note</button>
+        <button type="submit" class="btn btn-outline-primary w-100">Save Note</button>
       </form>
     </div>
   </div>
 
   <!-- Right Column -->
-  <div class="col-md-8">
+  <div class="col-12 col-md-8">
     <!-- PIE CHART -->
-    <div class="card p-3 mb-3">
+    <div class="card p-3 mb-3 fade-in">
       <h6 class="text-muted mb-2">🧁 Category Breakdown</h6>
       <div class="d-flex align-items-center justify-content-center" style="min-height: 280px;">
         <canvas id="expensesChart" width="280" height="280" style="max-width: 100%; height: auto;"></canvas>
@@ -68,8 +68,8 @@
     </div>
 
     <!-- EXPENSE LIST -->
-    <div class="card p-3">
-      <form method="get" class="mb-2 d-flex align-items-center gap-2">
+    <div class="card p-3 fade-in">
+      <form method="get" class="mb-2 d-flex flex-wrap align-items-center gap-2">
         <label for="filter" class="form-label m-0">Filter:</label>
         <select name="filter" id="filter" class="form-select form-select-sm w-auto" onchange="this.form.submit()">
           <option value="all" {% if filter=='all' %}selected{% endif %}>All</option>
@@ -101,8 +101,8 @@
 </div>
 
 <!-- ADD EXPENSE -->
-<div class="mt-4 text-end">
-  <a href="{{ url_for('add_expense') }}" class="btn btn-success">+ Add Expense</a>
+<div class="mt-4 text-end fade-in">
+  <a href="{{ url_for('add_expense') }}" class="btn btn-success">➕ Add Expense</a>
 </div>
 
 <!-- CHART.JS -->

@@ -1,25 +1,35 @@
 {% extends "base.html" %}
 {% block content %}
-  <form method="POST">
-    <div class="mb-3">
-      <label>Amount</label>
-      <input type="number" name="amount" step="0.01" class="form-control" required>
+<div class="row justify-content-center fade-in">
+  <div class="col-12 col-md-6 col-lg-5">
+    <div class="card p-4">
+      <h5 class="text-center text-muted mb-4">➕ Add New Expense</h5>
+      <form method="POST">
+        <div class="mb-3">
+          <label for="amount" class="form-label">Amount</label>
+          <input type="number" step="0.01" class="form-control" name="amount" required>
+        </div>
+        <div class="mb-3">
+          <label for="description" class="form-label">Description</label>
+          <input type="text" class="form-control" name="description" required>
+        </div>
+        <div class="mb-3">
+          <label for="category" class="form-label">Category</label>
+          <select name="category" class="form-select" required>
+            <option value="Food">🍔 Food</option>
+            <option value="Transport">🚗 Transport</option>
+            <option value="Entertainment">🎮 Entertainment</option>
+            <option value="Bills">💡 Bills</option>
+            <option value="Health">💊 Health</option>
+            <option value="Shopping">🛍️ Shopping</option>
+            <option value="Other">💸 Other</option>
+          </select>
+        </div>
+        <div class="d-grid">
+          <button type="submit" class="btn btn-success">Add Expense</button>
+        </div>
+      </form>
     </div>
-    <div class="mb-3">
-      <label>Description</label>
-      <input type="text" name="description" class="form-control" required>
-    </div>
-    <div class="mb-3">
-      <label>Category</label>
-      <select name="category" class="form-control" required>
-        <option>Food</option>
-        <option>Transport</option>
-        <option>Entertainment</option>
-        <option>Bills</option>
-        <option>Other</option>
-      </select>
-    </div>
-    <button type="submit" class="btn btn-success">Add Expense</button>
-    <a href="{{ url_for('index') }}" class="btn btn-secondary">Cancel</a>
-  </form>
+  </div>
+</div>
 {% endblock %}

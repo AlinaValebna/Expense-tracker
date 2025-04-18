@@ -1,17 +1,21 @@
 {% extends "base.html" %}
 {% block content %}
-<a href="{{ url_for('index') }}" class="btn btn-secondary mb-3">← Back to Expenses</a>
-<h3>Summary for {{ month }} {{ year }}</h3>
-<h4>Total Spent: ${{ total }}</h4>
+<div class="fade-in">
+    <a href="{{ url_for('index') }}" class="btn btn-secondary mb-3">← Back to Expenses</a>
+    <div class="card p-4">
+        <h5 class="text-muted">📅 Summary for {{ month }} {{ year }}</h5>
+        <h6 class="mb-4">Total Spent: <strong>${{ total }}</strong></h6>
 
-<ul class="list-group mt-4">
-    {% for category, amount in summary %}
-    <li class="list-group-item d-flex justify-content-between">
-        <span>{{ category }}</span>
-        <strong>${{ '%.2f' | format(amount) }}</strong>
-    </li>
-    {% else %}
-    <li class="list-group-item text-muted">No expenses recorded this month.</li>
-    {% endfor %}
-</ul>
+        <ul class="list-group">
+            {% for category, amount in summary %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <span>{{ category }}</span>
+                <strong>${{ '%.2f' | format(amount) }}</strong>
+            </li>
+            {% else %}
+            <li class="list-group-item text-muted">No expenses recorded this month.</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
 {% endblock %}
