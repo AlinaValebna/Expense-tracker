@@ -5,18 +5,20 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy import func, extract
 from datetime import datetime, timedelta
 from collections import defaultdict
+import os
 
 app = Flask(__name__)
-import os
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///{}'.format(os.path.join(os.getcwd(), 'expenses.db'))
+
+# Use appropriate SQLite path depending on environment
+if os.getenv("RENDER"):
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/expenses.db'
+else:
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///expenses.db'
+
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.secret_key = 'your_secret_key_here'
 
-# Extensions
 db = SQLAlchemy(app)
-login_manager = LoginManager()
-login_manager.login_view = 'login'
-login_manager.init_app(app)
 
 # Models
 class User(UserMixin, db.Model):
@@ -24,7 +26,6 @@ class User(UserMixin, db.Model):
     username = db.Column(db.String(100), nullable=False, unique=True)
     email = db.Column(db.String(150), nullable=False, unique=True)
     password = db.Column(db.String(200), nullable=False)
-
     expenses = db.relationship('Expense', backref='owner', lazy=True)
     saving_goals = db.relationship('SavingGoal', backref='owner', lazy=True)
     incomes = db.relationship('Income', backref='owner', lazy=True)
@@ -65,10 +66,25 @@ class WealthNote(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
+login_manager = LoginManager()
+login_manager.login_view = 'login'
+login_manager.init_app(app)
 
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
+
+with app.app_context():
+    try:
+        db.create_all()
+    except Exception as e:
+        print(f"❌ Database creation failed: {e}")
+
+@app.route('/init-db')
+def init_db():
+    with app.app_context():
+        db.create_all()
+    return "✅ Database tables created!"
 
 category_icons = {
     "Food": "🍔",
@@ -298,13 +314,5 @@ def add_wealth_note():
     db.session.commit()
     return redirect(url_for('index'))
 
-@app.route('/init-db')
-def init_db():
-    with app.app_context():
-        db.create_all()
-    return "✅ Database tables created!"
-
 if __name__ == '__main__':
-    with app.app_context():
-        db.create_all()
     app.run(debug=True)
