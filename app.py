@@ -10,8 +10,8 @@ import os
 app = Flask(__name__)
 
 # Use appropriate SQLite path depending on environment
-if os.getenv("RENDER"):
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/expenses.db'
+if os.getenv("FLY_APP_NAME"):
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////data/expenses.db'
 else:
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///expenses.db'
 
